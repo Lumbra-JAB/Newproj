@@ -6,6 +6,7 @@ include 'database.php';
 <html>
 <head>
     <title>Customer - Local Bookstore</title>
+    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
 </head>
 <body>
     <h1>Customers</h1>
@@ -22,8 +23,7 @@ include 'database.php';
             <th>Actions</th>
         </tr>
         <?php
-        // Query to fetch all customers
-        $sql = "SELECT * FROM customer";
+        $sql = "SELECT * FROM customer ORDER BY Name ASC";  
         $result = $connection->query($sql);
 
         // Check if there are any customers

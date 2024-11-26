@@ -2,8 +2,8 @@
 session_start();
 include '../database.php';
 
-// Validate and sanitize ISBN
-$bookISBN = filter_input(INPUT_GET, 'isbn', FILTER_SANITIZE_STRING);
+// Validate ISBN from the URL
+$bookISBN = isset($_GET['isbn']) ? $_GET['isbn'] : null;
 
 if (!$bookISBN) {
     die("Invalid ISBN provided");
@@ -23,9 +23,9 @@ if (!$book) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and validate inputs
-    $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
-    $year = filter_input(INPUT_POST, 'year', FILTER_VALIDATE_INT);
-    $publisher = filter_input(INPUT_POST, 'publisher', FILTER_SANITIZE_STRING);
+    $title = $_POST['title'] ?? '';
+    $year = $_POST['year'] ?? '';
+    $publisher = $_POST['publisher'] ?? '';
 
     // Validate inputs
     $errors = [];
@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <button type="submit" class="btn">Update Book</button>
-            <a href="../books.php" class="btn" style="background-color: #6c757d; margin-left: 10px;">Cancel</a>
+            <a href="../book.php" class="btn" style="background-color: #6c757d; margin-left: 10px;">Cancel</a>
         </form>
     </div>
 </body>

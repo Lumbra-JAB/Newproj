@@ -2,11 +2,11 @@
 session_start();
 include '../database.php';
 
-// Validate Customer ID
+// Retrieve Customer ID directly from GET request
 $customerID = $_GET['customer_id'] ?? '';
 
 if (empty($customerID)) {
-    die("Invalid Customer ID provided");
+    die("Invalid or missing Customer ID.");
 }
 
 // Fetch existing customer details
@@ -17,12 +17,12 @@ $result = $stmt->get_result();
 $customer = $result->fetch_assoc();
 
 if (!$customer) {
-    die("Customer not found");
+    die("Customer not found.");
 }
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get inputs directly without sanitization
+    // Retrieve form data directly
     $name = $_POST['name'] ?? '';
     $phoneNumber = $_POST['phoneNumber'] ?? '';
     $address = $_POST['address'] ?? '';
@@ -30,33 +30,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate inputs
     $errors = [];
-    if (empty($name)) $errors[] = "Name is required";
-    if (empty($phoneNumber)) $errors[] = "Phone number is required";
-    if (empty($address)) $errors[] = "Address is required";
-    if (empty($dateOfBirth)) $errors[] = "Date of birth is required";
+    if (empty($name)) $errors[] = "Name is required.";
+    if (empty($phoneNumber)) $errors[] = "Phone number is required.";
+    if (empty($address)) $errors[] = "Address is required.";
+    if (empty($dateOfBirth)) $errors[] = "Date of birth is required.";
 
     if (empty($errors)) {
-        try {
-            // Prepare update statement
-            $updateStmt = $connection->prepare("UPDATE Customer SET Name = ?, PhoneNumber = ?, Address = ?, DateOfBirth = ? WHERE CustomerID = ?");
-            $updateStmt->bind_param("ssssi", $name, $phoneNumber, $address, $dateOfBirth, $customerID);
-            
-            if ($updateStmt->execute()) {
-                $successMessage = "Customer updated successfully";
-                // Refresh customer data
-                $customer = [
-                    'Name' => $name,
-                    'PhoneNumber' => $phoneNumber,
-                    'Address' => $address,
-                    'DateOfBirth' => $dateOfBirth
-                ];
-            } else {
-                $errors[] = "Update failed: " . $updateStmt->error;
-            }
-            $updateStmt->close();
-        } catch (Exception $e) {
-            $errors[] = "An error occurred: " . $e->getMessage();
+        // Update customer details
+        $stmt = $connection->prepare("UPDATE customer SET Name = ?, PhoneNumber = ?, Address = ?, DateOfBirth = ? WHERE CustomerID = ?");
+        $stmt->bind_param("sssss", $name, $phoneNumber, $address, $dateOfBirth, $customerID);
+
+        if ($stmt->execute()) {
+            $successMessage = "Customer updated successfully.";
+            // Refresh customer data
+            $customer = [
+                'Name' => $name,
+                'PhoneNumber' => $phoneNumber,
+                'Address' => $address,
+                'DateOfBirth' => $dateOfBirth
+            ];
+        } else {
+            $errors[] = "Update failed: " . $stmt->error;
         }
+        $stmt->close();
     }
 }
 ?>
@@ -131,4 +127,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input 
                     type="date" 
                     id="dateOfBirth" 
-                    name="date
+                    name="dateOfBirth" 
+                    value="<?php echo htmlspecialchars($customer['DateOfBirth']); ?>" 
+                    required
+                >
+            </div>
+
+            <button type="submit">Update Customer</button>
+        </form>
+
+        <a href="../customer.php" class="btn">Back to Customers</a>
+    </div>
+</body>
+</html>

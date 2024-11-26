@@ -30,11 +30,13 @@ function getEmployees($connection) {
 function addBook($connection, $isbn, $title, $year, $publisher, $imagePath) {
     $stmt = $connection->prepare("INSERT INTO book (ISBN, Title, Year, Publisher, Image) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiss", $isbn, $title, $year, $publisher, $imagePath);
-    
+    return $stmt->execute();  // Return the success/failure of the query
 }
 
 // Handle form submission
 $feedback = "";
+$bookAdded = false;  // Flag to track if the book was added
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $isbn = $_POST['isbn'];
     $title = $_POST['title'];
@@ -69,12 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (strlen($isbn) === 13 && $publisher) {
         if (addBook($connection, $isbn, $title, $year, $publisher, $imagePath)) {
             $feedback = "New book added successfully.";
-        } 
+            $bookAdded = true;  // Set flag to true when book is successfully added
+        } else {
+            $feedback = "Error adding book.";
+        }
     } else {
         $feedback = "Error: ISBN must be 13 digits and publisher must be valid.";
     }
 }
-
 
 // Auto-generate an ISBN
 $autoISBN = generateISBN();
@@ -87,14 +91,20 @@ $employees = getEmployees($connection);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Book - Local Bookstore</title>
-    <link rel="stylesheet" href="../add.css">
+    <link rel="stylesheet" type="text/css" href="../CCS/add.css">
 </head>
 <body>
     <h2>Add New Book</h2>
-    <button><a href="../home.php">Home</a></button>
+    
     <button><a href="../book.php">Back</a></button>
+
+    <!-- Display feedback message (success or error) -->
     <?php if ($feedback): ?>
         <p><?php echo htmlspecialchars($feedback); ?></p>
+        <?php if ($bookAdded): ?>
+            <!-- Only show the link to the book list after the book is added -->
+            <a href="../book.php" class="btn">Back to Book List</a>
+        <?php endif; ?>
     <?php endif; ?>
 
     <form method="POST" action="" enctype="multipart/form-data">
@@ -103,7 +113,7 @@ $employees = getEmployees($connection);
         <label>Title:</label><br>
         <input type="text" name="title" required><br>
         <label>Year:</label><br>
-        <input type="number" name="year" min="1000" max="9999" required><br>
+        <input type="number" name="year" min="1800" max="9999" required><br>
         <label>Author (Employee):</label><br>
         <select name="employee" required>
             <?php while($row = $employees->fetch_assoc()): ?>
@@ -111,14 +121,8 @@ $employees = getEmployees($connection);
             <?php endwhile; ?>
         </select><br>
         <label>Image:</label><br>
-        <input type="file" name="image" accept="image/*"><br>
+        <input type="file" class="form-control" id="bookimg" name="bookimg" accept=".png, .jpg, .jpeg">
         <input type="submit" value="Add Book">
-        <?php if ($feedback === "New book added successfully."): ?>
-    <div class="success-modal">
-        <p><?php echo htmlspecialchars($feedback); ?></p>
-        <a href="../book.php" class="btn">Back to Book List</a>
-    </div>
-<?php endif; ?>
     </form>
 </body>
 </html>

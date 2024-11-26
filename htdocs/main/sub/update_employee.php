@@ -2,61 +2,59 @@
 session_start();
 include '../database.php';
 
-// Validate and sanitize Taxpayer ID
-$taxpayerID = filter_input(INPUT_GET, 'taxpayerID', FILTER_SANITIZE_STRING);
 
-if (!$taxpayerID) {
-    die("Invalid Taxpayer ID provided");
+if (!isset($_GET['taxpayer_id']) || empty(trim($_GET['taxpayer_id']))) {
+    die("Invalid or missing Taxpayer ID.");
 }
 
+$taxpayerID = htmlspecialchars(trim($_GET['taxpayer_id']));
+
+
+
 // Fetch existing employee details
-$stmt = $connection->prepare("SELECT * FROM Employee WHERE TaxpayerID = ?");
+$stmt = $connection->prepare("SELECT * FROM employee WHERE TaxpayerID = ?");
 $stmt->bind_param("s", $taxpayerID);
 $stmt->execute();
 $result = $stmt->get_result();
 $employee = $result->fetch_assoc();
 
 if (!$employee) {
-    die("Employee not found");
+    die("Employee not found.");
 }
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize and validate inputs
-    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-    $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_STRING);
-    $dateOfBirth = filter_input(INPUT_POST, 'dateOfBirth', FILTER_SANITIZE_STRING);
-    $pseudonym = filter_input(INPUT_POST, 'pseudonym', FILTER_SANITIZE_STRING);
+    // Retrieve form data directly
+    $name = $_POST['name'] ?? '';
+    $address = $_POST['address'] ?? '';
+    $dateOfBirth = $_POST['dateOfBirth'] ?? '';
+    $pseudonym = $_POST['pseudonym'] ?? '';
 
     // Validate inputs
     $errors = [];
-    if (empty($name)) $errors[] = "Name is required";
-    if (empty($address)) $errors[] = "Address is required";
-    if (empty($dateOfBirth)) $errors[] = "Date of birth is required";
-    if (empty($pseudonym)) $errors[] = "Pseudonym is required";
+    if (empty($name)) $errors[] = "Name is required.";
+    if (empty($address)) $errors[] = "Address is required.";
+    if (empty($dateOfBirth)) $errors[] = "Date of birth is required.";
+    if (empty($pseudonym)) $errors[] = "Pseudonym is required.";
 
     if (empty($errors)) {
-        try {
-            // Prepare update statement
-            $updateStmt = $connection->prepare("UPDATE Employee SET Name = ?, Address = ?, DateOfBirth = ?, Pseudonym = ? WHERE TaxpayerID = ?");
-            $updateStmt->bind_param("ssssi", $name, $address, $dateOfBirth, $pseudonym, $taxpayerID);
-            
-            if ($updateStmt->execute()) {
-                $successMessage = "Employee updated successfully";
-                // Refresh employee data
-                $employee = [
-                    'Name' => $name,
-                    'Address' => $address,
-                    'DateOfBirth' => $dateOfBirth,
-                    'Pseudonym' => $pseudonym
-                ];
-            } else {
-                $errors[] = "Update failed: " . $updateStmt->error;
-            }
-            $updateStmt->close();
-        } catch (Exception $e) {
-            $errors[] = "An error occurred: " . $e->getMessage();
+        // Update employee details
+        $stmt = $connection->prepare("UPDATE employee SET Name = ?, Address = ?, DateOfBirth = ?, Pseudonym = ? WHERE TaxpayerID = ?");
+        $stmt->bind_param("sssss", $name, $address, $dateOfBirth, $pseudonym, $taxpayerID);
+
+        if ($stmt->execute()) {
+            $successMessage = "Employee updated successfully.";
+            // Refresh employee data
+            $employee = [
+                'Name' => $name,
+                'Address' => $address,
+                'DateOfBirth' => $dateOfBirth,
+                'Pseudonym' => $pseudonym
+            ];
+        } else {
+            $errors[] = "Update failed: " . $stmt->error;
         }
+        $stmt->close();
     }
 }
 ?>
@@ -67,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Employee - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../css/delete-styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/.css">
 </head>
 <body>
     <div class="container">
@@ -126,4 +124,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="form-group">
-                <label for="pseud
+                <label for="pseudonym">Pseudonym:</label>
+                <input 
+                    type="text" 
+                    id="pseudonym" 
+                    name="pseudonym" 
+                    value="<?php echo htmlspecialchars($employee['Pseudonym']); ?>" 
+                    required
+                    maxlength="255"
+                >
+            </div>
+
+            <button type="submit">Update Employee</button>
+        </form>
+
+        <a href="../employee.php" class="btn">Back to Employees</a>
+    </div>
+</body>
+</html>

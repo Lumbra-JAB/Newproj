@@ -6,15 +6,15 @@ include 'database.php';
 <html>
 <head>
     <title>Books - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="books.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
 </head>
 <body>
+    <button><a href="home.php">Home</a></button>
     <header>
         <h2>Books</h2>
         <div class="books-container">
             <?php
-            // SQL query to fetch books
-            $sql = "SELECT * FROM book";
+            $sql = "SELECT * FROM book ORDER BY Title ASC";  
             $result = $connection->query($sql);
 
             // Error handling for the query

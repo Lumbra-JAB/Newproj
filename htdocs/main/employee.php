@@ -42,9 +42,10 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>Employees - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="books.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
 </head>
 <body>
+     
     <div class="container">
         <header>
             <nav>
@@ -58,7 +59,7 @@ try {
                     <?php echo htmlspecialchars($errorMessage); ?>
                 </div>
             <?php else: ?>
-                <table>
+                <table border="1">
                     <thead>
                         <tr>
                             <th>Taxpayer ID</th>
@@ -71,6 +72,8 @@ try {
                     </thead>
                     <tbody>
                         <?php
+                        $sql = "SELECT * FROM employee ORDER BY Name ASC";  
+                        $result = $connection->query($sql);
                         if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 echo '<tr>';

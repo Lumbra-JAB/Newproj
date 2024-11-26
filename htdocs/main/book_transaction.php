@@ -7,13 +7,14 @@ include 'database.php';
 <html>
 <head>
     <title>Books - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="books.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
 </head>
 <body>
     <header>
         <div class="image">           
             <div class="menu">               
         <a href="home.php">Home</a>
+        <a href="sale_transaction.php">Back</a>
         <h2>Books</h2>
     <table>
         <tr>
