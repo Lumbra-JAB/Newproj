@@ -63,11 +63,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Customer - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../css/delete-styles.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/update.css">
 </head>
 <body>
     <div class="container">
-        <h2>Update Customer ID: <?php echo htmlspecialchars($customerID); ?></h2>
+        <h2>Update Customer ID: <?php echo htmlspecialchars($customerID);
+        ?></h2>
         
         <?php 
         // Display errors

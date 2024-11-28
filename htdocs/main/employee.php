@@ -42,18 +42,26 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>Employees - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
+    <link rel="stylesheet" type="text/css" href="CSS/function.css">
 </head>
 <body>
-     
+<nav>
+    <h1><div class="logo"><b>Local Bookstore</div></h1>
+    <div class="links">
+        <a href="home.php">Home</a>
+        <a href="book.php">Books</a>
+        <a href="sale_transaction.php">Sales Transactions</a>
+        <a href="customer.php">Customers</a>
+        <a href="employee.php">Employees</a>
+    </div>
+</nav>
+
     <div class="container">
         <header>
-            <nav>
-                <a href="sub/add_employee.php">Add New Employee</a>
-            </nav>
-
+            
+            <a href="sub/add_employee.php" class="button add-button">Add New Employee</a>
             <h2>Employees</h2>
-            <button><a href="home.php">Home</a></button>
+            
             <?php if (isset($errorMessage)): ?>
                 <div class="error-message">
                     <?php echo htmlspecialchars($errorMessage); ?>
@@ -83,8 +91,8 @@ try {
                                 echo '<td>' . htmlspecialchars($row['DateOfBirth']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['Pseudonym']) . '</td>';
                                 echo '<td>
-                                    <a href="sub/delete_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '">Delete</a> 
-                                    <a href="sub/update_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '">Update</a> 
+                                    <a href="sub/delete_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '?>"class="button delete-button">Delete</a> 
+                                    <a href="sub/update_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '?>"class="button update-button">Update</a> 
                                 </td>';
                                 echo '</tr>';
                             }

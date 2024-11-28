@@ -19,11 +19,11 @@ body {
 nav {
     background-color: #0047ab;
     color: white;
-    padding: 10px 20px;
+    padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 nav a {
@@ -171,4 +171,58 @@ footer {
     text-align: center;
     color: #666;
     font-size: 14px;
+}
+/* General button styles */
+button, a.button {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Add button */
+a.add-button {
+    background-color: #28a745; /* Green for add */
+    color: white;
+    border: none;
+}
+
+a.add-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* Update button */
+a.update-button {
+    background-color: #007bff; /* Blue for update */
+    color: white;
+    border: none;
+}
+
+a.update-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Delete button */
+a.delete-button {
+    background-color: #dc3545; /* Red for delete */
+    color: white;
+    border: none;
+}
+
+a.delete-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
+
+/* Disable text-decoration for all buttons */
+a.button:hover, button:hover {
+    text-decoration: none;
 }

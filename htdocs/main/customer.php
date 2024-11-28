@@ -6,12 +6,23 @@ include 'database.php';
 <html>
 <head>
     <title>Customer - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../CSS/function.css">
+    <link rel="stylesheet" type="text/css" href="CSS/function.css">
 </head>
 <body>
+<nav>
+    <h1><div class="logo"><b>Local Bookstore</div></b></h1>
+    <div class="links">
+        <a href="home.php">Home</a>
+        <a href="book.php">Books</a>
+        <a href="sale_transaction.php">Sales Transactions</a>
+        <a href="customer.php">Customers</a>
+        <a href="employee.php">Employees</a>
+    </div>
+</nav>
+
     <h1>Customers</h1>
-    <button><a href="home.php">Home</a></button><br>
-    <a href="sub/add_customer.php">Add New Customer</a>
+    
+    <a href="sub/add_customer.php" class="button add-button">Add New Customer</a>
     
     <table border="1">
         <tr>
@@ -37,8 +48,8 @@ include 'database.php';
                 echo '<td>' . $row['Address'] . '</td>';
                 echo '<td>' . $row['DateOfBirth'] . '</td>';
                 echo '<td>
-                        <a href="sub/delete_customer.php?customer_id=' . $row['CustomerID'] . '">Delete</a> 
-                        <a href="sub/update_customer.php?customer_id=' . $row['CustomerID'] . '">Update</a>
+                        <a href="sub/delete_customer.php?customer_id=' . $row['CustomerID'] . '?>"class="button delete-button">Delete</a> 
+                        <a href="sub/update_customer.php?customer_id=' . $row['CustomerID'] . '?>"class="button update-button">Update</a>
                       </td>';
                 echo '</tr>';
             }

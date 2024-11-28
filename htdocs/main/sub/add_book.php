@@ -2,40 +2,32 @@
 session_start();
 include '../database.php';
 
-// Function to generate an ISBN
+// Generate ISBN-13 with a valid check digit
 function generateISBN() {
     $isbnBase = str_pad(rand(0, 999999999999), 12, '0', STR_PAD_LEFT);
-    return $isbnBase . calculateISBNCheckDigit($isbnBase);
-}
-
-// Function to calculate the check digit for ISBN-13
-function calculateISBNCheckDigit($isbnBase) {
     $sum = 0;
     for ($i = 0; $i < 12; $i++) {
-        $digit = intval($isbnBase[$i]);
+        $digit = (int) $isbnBase[$i];
         $sum += ($i % 2 === 0) ? $digit : $digit * 3;
     }
-    $remainder = $sum % 10;
-    return ($remainder === 0) ? 0 : 10 - $remainder;
+    $checkDigit = (10 - ($sum % 10)) % 10;
+    return $isbnBase . $checkDigit;
 }
 
 // Fetch employees for the dropdown
 function getEmployees($connection) {
-    $stmt = $connection->prepare("SELECT TaxpayerID, Name FROM employee");
-    $stmt->execute();
-    return $stmt->get_result();
+    return $connection->query("SELECT TaxpayerID, Name FROM employee");
 }
 
 // Insert a new book into the database
 function addBook($connection, $isbn, $title, $year, $publisher, $imagePath) {
     $stmt = $connection->prepare("INSERT INTO book (ISBN, Title, Year, Publisher, Image) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiss", $isbn, $title, $year, $publisher, $imagePath);
-    return $stmt->execute();  // Return the success/failure of the query
+    return $stmt->execute();
 }
 
-// Handle form submission
 $feedback = "";
-$bookAdded = false;  // Flag to track if the book was added
+$bookAdded = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $isbn = $_POST['isbn'];
@@ -47,22 +39,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = $connection->prepare("SELECT Name FROM employee WHERE TaxpayerID = ?");
     $stmt->bind_param("i", $employeeId);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $publisherRow = $result->fetch_assoc();
-    $publisher = $publisherRow['Name'] ?? null;
+    $publisher = $stmt->get_result()->fetch_assoc()['Name'] ?? null;
 
     // Handle image upload
     $imagePath = null;
-    if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
+    if (!empty($_FILES['image_path']['name']) && $_FILES['image_path']['error'] === UPLOAD_ERR_OK) {
         $targetDir = "uploads/";
-        // Create uploads directory if it doesn't exist
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $imageFile = $targetDir . uniqid() . '_' . basename($_FILES["image"]["name"]);
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $imageFile)) {
-            $imagePath = $imageFile;
-        } else {
+        if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
+        $imagePath = $targetDir . uniqid() . '_' . basename($_FILES['image_path']['name']);
+        if (!move_uploaded_file($_FILES['image_path']['tmp_name'], $imagePath)) {
             $feedback = "Error uploading the image.";
         }
     }
@@ -71,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (strlen($isbn) === 13 && $publisher) {
         if (addBook($connection, $isbn, $title, $year, $publisher, $imagePath)) {
             $feedback = "New book added successfully.";
-            $bookAdded = true;  // Set flag to true when book is successfully added
+            $bookAdded = true;
         } else {
             $feedback = "Error adding book.";
         }
@@ -80,7 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// Auto-generate an ISBN
 $autoISBN = generateISBN();
 $employees = getEmployees($connection);
 ?>
@@ -91,18 +75,16 @@ $employees = getEmployees($connection);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Book - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../CCS/add.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/add.css">
 </head>
 <body>
     <h2>Add New Book</h2>
-    
     <button><a href="../book.php">Back</a></button>
 
-    <!-- Display feedback message (success or error) -->
+    <!-- Display feedback -->
     <?php if ($feedback): ?>
         <p><?php echo htmlspecialchars($feedback); ?></p>
         <?php if ($bookAdded): ?>
-            <!-- Only show the link to the book list after the book is added -->
             <a href="../book.php" class="btn">Back to Book List</a>
         <?php endif; ?>
     <?php endif; ?>
@@ -116,12 +98,14 @@ $employees = getEmployees($connection);
         <input type="number" name="year" min="1800" max="9999" required><br>
         <label>Author (Employee):</label><br>
         <select name="employee" required>
-            <?php while($row = $employees->fetch_assoc()): ?>
-                <option value="<?php echo htmlspecialchars($row['TaxpayerID']); ?>"><?php echo htmlspecialchars($row['Name']); ?></option>
+            <?php while ($row = $employees->fetch_assoc()): ?>
+                <option value="<?php echo htmlspecialchars($row['TaxpayerID']); ?>">
+                    <?php echo htmlspecialchars($row['Name']); ?>
+                </option>
             <?php endwhile; ?>
         </select><br>
         <label>Image:</label><br>
-        <input type="file" class="form-control" id="bookimg" name="bookimg" accept=".png, .jpg, .jpeg">
+        <input type="file" name="image_path" accept=".png, .jpg, .jpeg"><br>
         <input type="submit" value="Add Book">
     </form>
 </body>

@@ -69,7 +69,7 @@ $connection->close();
 
     <form method="POST" action="" autocomplete="off">
         <div class="form-group">
-            <label for="name">Full Name(Lastname, FirstNawme):</label>
+            <label for="name">Full Name(Lastname, FirstName):</label>
             <input type="text" id="name" name="name" required minlength="2" maxlength="50" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces">
         </div>
 
