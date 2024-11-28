@@ -38,16 +38,18 @@ include 'database.php';
                 while ($row = $result->fetch_assoc()) {
                     // Set the image path or a default placeholder
                     $imagePath = '';
+                    $FinalizedImagePath = '';
 
-                    if (!empty($row['Image']) && file_exists('sub/uploads/' . $row['Image'])) {
+                    if (!empty($row['Image']) && file_exists('sub/' . $row['Image'])) {
                         $imagePath = htmlspecialchars($row['Image']);
                     }else{
                         $imagePath = '';
                     }
 
+                    $FinalizedImagePath = 'sub/' . $imagePath;
                     echo '
                     <div class="book-item">
-                        <img src="' . $imagePath . '" alt="' . htmlspecialchars($row['Title']) . '" style="width: 150px; height: auto;">
+                        <img src="' . $FinalizedImagePath . '" alt="' . htmlspecialchars($row['Title']) . '" style="width: 150px; height: auto;">
                         <div class="book-info">
                             <p><strong>ISBN:</strong> ' . htmlspecialchars($row['ISBN']) . '</p>
                             <p><strong>Title:</strong> ' . htmlspecialchars($row['Title']) . '</p>

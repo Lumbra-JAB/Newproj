@@ -24,11 +24,11 @@ include 'database.php';
     
 <a href="sub/add_transaction.php" class="button add-button">Add New Sales Transaction</a>
                 
-
+<h2>Sales Transaction</h2>
     <header>
         <div class="image">
             <div class="menu">
-                <h2>Sales Transaction</h2>
+                
                 <table border="1">
                     <tr>
                         <th>TransactionID</th>

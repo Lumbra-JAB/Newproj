@@ -20,10 +20,10 @@ include 'database.php';
     </div>
 </nav>
 
-    <h1>Customers</h1>
+   
     
     <a href="sub/add_customer.php" class="button add-button">Add New Customer</a>
-    
+     <h2>Customers</h2>
     <table border="1">
         <tr>
             <th>CustomerID</th>

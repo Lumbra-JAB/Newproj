@@ -8,7 +8,7 @@ include '../database.php';
 <head>
     <meta charset="UTF-8">
     <title>Delete Book</title>
-    <link rel="stylesheet" type="text/css" href="delete.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/delete.css">
 </head>
 <body>
     <div class="container">

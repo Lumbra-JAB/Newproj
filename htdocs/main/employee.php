@@ -57,6 +57,7 @@ try {
 </nav>
 
     <div class="container">
+        
         <header>
             
             <a href="sub/add_employee.php" class="button add-button">Add New Employee</a>
