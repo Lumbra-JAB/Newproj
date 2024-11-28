@@ -10,7 +10,7 @@ function getEmployees($connection) {
 // Update an existing book in the database
 function updateBook($connection, $isbn, $title, $year, $publisher, $imagePath) {
     $stmt = $connection->prepare("UPDATE book SET Title = ?, Year = ?, Publisher = ?, Image = ? WHERE ISBN = ?");
-    $stmt->bind_param("ssiss", $title, $year, $publisher, $imagePath, $isbn);
+    $stmt->bind_param("sssss", $title, $year, $publisher, $imagePath, $isbn);
     return $stmt->execute();
 }
 

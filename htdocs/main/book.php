@@ -37,7 +37,13 @@ include 'database.php';
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     // Set the image path or a default placeholder
-                    $imagePath = !empty($row['Image']) && file_exists($row['Image']) ? htmlspecialchars($row['Image']) : 'uploads/default_image.jpg';
+                    $imagePath = '';
+
+                    if (!empty($row['Image']) && file_exists('sub/uploads/' . $row['Image'])) {
+                        $imagePath = htmlspecialchars($row['Image']);
+                    }else{
+                        $imagePath = '';
+                    }
 
                     echo '
                     <div class="book-item">
