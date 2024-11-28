@@ -48,8 +48,8 @@ include 'database.php';
                 echo '<td>' . $row['Address'] . '</td>';
                 echo '<td>' . $row['DateOfBirth'] . '</td>';
                 echo '<td>
-                        <a href="sub/delete_customer.php?customer_id=' . $row['CustomerID'] . '?>"class="button delete-button">Delete</a> 
-                        <a href="sub/update_customer.php?customer_id=' . $row['CustomerID'] . '?>"class="button update-button">Update</a>
+                        <a href="sub/delete_customer.php?customer_id=' . $row['CustomerID'] . '"class="button delete-button">Delete</a> 
+                        <a href="sub/update_customer.php?customer_id=' . $row['CustomerID'] . '"class="button update-button">Update</a>
                       </td>';
                 echo '</tr>';
             }

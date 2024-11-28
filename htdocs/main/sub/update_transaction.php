@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Sales Transaction - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="../CSS/transac.css">
+    <link rel="stylesheet" type="text/css" href="../CSS/update.css">
 </head>
 <body>
 
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="date" name="date" id="date" value="<?php echo $transaction['Date']; ?>" required><br>
 
             <!-- Time Input -->
-            <label for="time">Time:</label>
+            <label for="time">Time:</label><br>
             <input type="time" name="time" id="time" value="<?php echo $transaction['Time']; ?>" required><br>
 
             <!-- Quantity Input -->
@@ -90,8 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="number" name="quantity" id="quantity" value="<?php echo $transaction['Quantity']; ?>" required><br>
 
             <!-- Submit Button -->
-            <input type="submit" value="Update Transaction">
-
+            <input type="submit" value="Update Transaction"><br>
+            <a href="../sale_transaction.php" class="btn">Back to Transactions</a>
         </form>
     </div>
 

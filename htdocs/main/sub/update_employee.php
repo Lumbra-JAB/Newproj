@@ -1,39 +1,59 @@
 <?php
 session_start();
-include 'database.php';
+include '../database.php';
 
-// Check if database connection is established
-if (!$connection) {
-    die("Database connection failed: " . mysqli_connect_error());
+// Retrieve Taxpayer ID directly from GET request
+$taxpayerID = $_GET['taxpayer_id'] ?? '';
+
+if (empty($taxpayerID)) {
+    die("Invalid or missing Taxpayer ID.");
 }
 
-// Pagination setup
-try {
-    // Count total records
-    $countQuery = "SELECT COUNT(*) as count FROM employee";
-    $result = mysqli_query($connection, $countQuery);
+// Fetch existing employee details
+$stmt = $connection->prepare("SELECT * FROM employee WHERE TaxpayerID = ?");
+$stmt->bind_param("i", $taxpayerID);
+$stmt->execute();
+$result = $stmt->get_result();
+$employee = $result->fetch_assoc();
 
-    $totalRecords = $result->fetch_assoc()['count'];
-    // Pagination variables
-    $recordsPerPage = 10;
-    $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $offset = ($page - 1) * $recordsPerPage;
-    $totalPages = ceil($totalRecords / $recordsPerPage);
+if (!$employee) {
+    die("Employee not found.");
+}
 
-    // Fetch employees with pagination
-    $stmt = $connection->prepare("SELECT * FROM employee LIMIT ? OFFSET ?");
-    
-    $stmt->bind_param("ii", $recordsPerPage, $offset);
-    
-    if (!$stmt->execute()) {
-        throw new Exception("Error executing query: " . $stmt->error);
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data directly
+    $name = $_POST['name'] ?? '';
+    $address = $_POST['address'] ?? '';
+    $dateOfBirth = $_POST['date_of_birth'] ?? '';
+    $pseudonym = $_POST['pseudonym'] ?? '';
+
+    // Validate inputs
+    $errors = [];
+    if (empty($name)) $errors[] = "Name is required.";
+    if (empty($address)) $errors[] = "Address is required.";
+    if (empty($dateOfBirth)) $errors[] = "Date of birth is required.";
+    if (empty($pseudonym)) $errors[] = "Pseudonym is required.";
+
+    if (empty($errors)) {
+        // Update employee details
+        $stmt = $connection->prepare("UPDATE employee SET Name = ?, Address = ?, DateOfBirth = ?, Pseudonym = ? WHERE TaxpayerID = ?");
+        $stmt->bind_param("sssii", $name, $address, $dateOfBirth, $pseudonym, $taxpayerID);
+
+        if ($stmt->execute()) {
+            $successMessage = "Employee updated successfully.";
+            // Refresh employee data
+            $employee = [
+                'Name' => $name,
+                'Address' => $address,
+                'DateOfBirth' => $dateOfBirth,
+                'Pseudonym' => $pseudonym,
+            ];
+        } else {
+            $errors[] = "Update failed: " . $stmt->error;
+        }
+        $stmt->close();
     }
-    
-    $result = $stmt->get_result();
-} catch (Exception $e) {
-    // Log the error and show a user-friendly message
-    error_log($e->getMessage());
-    $errorMessage = "An error occurred while retrieving employees. Please try again later.";
 }
 ?>
 
@@ -41,76 +61,84 @@ try {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Employees - Local Bookstore</title>
-    <link rel="stylesheet" type="text/css" href="CSS/function.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Employee - Local Bookstore</title>
+    <link rel="stylesheet" type="text/css" href="../CSS/update.css">
 </head>
 <body>
-<nav>
-    <h1><div class="logo"><b>Local Bookstore</div></h1>
-    <div class="links">
-        <a href="home.php">Home</a>
-        <a href="book.php">Books</a>
-        <a href="sale_transaction.php">Sales Transactions</a>
-        <a href="customer.php">Customers</a>
-        <a href="employee.php">Employees</a>
-    </div>
-</nav>
+    <div class="container">
+        <?php
+            echo '<h2> Update Employee ID: ' . htmlspecialchars($taxpayerID) . ' </h2>';
+        ?>
 
-<div class="container">
-    <header>
-        <a href="sub/add_employee.php" class="button add-button">Add New Employee</a>
-        <h2>Employees</h2>
-        
-        <?php if (isset($errorMessage)): ?>
-            <div class="error-message">
-                <?php echo htmlspecialchars($errorMessage); ?>
+        <?php
+            // Display errors
+            if (!empty($errors)) {
+                echo '<div class="error-message">';
+                foreach ($errors as $error) {
+                    echo '<p>' . htmlspecialchars($error) . '</p>';
+                }
+                echo '</div>';
+            }
+
+            // Display success message
+            if (isset($successMessage)) {
+                echo '<div class="success-message">' . htmlspecialchars($successMessage) . '</div>';
+            }
+        ?>
+
+        <form method="POST" action="">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    value="<?php echo htmlspecialchars($employee['Name']); ?>" 
+                    required
+                    maxlength="255"
+                >
             </div>
-        <?php else: ?>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Taxpayer ID</th>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Date of Birth</th>
-                        <th>Pseudonym</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $sql = "SELECT * FROM employee ORDER BY Name ASC";  
-                    $result = $connection->query($sql);
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo '<tr>';
-                            echo '<td>' . htmlspecialchars($row['TaxpayerID']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['Name']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['Address']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['DateOfBirth']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['Pseudonym']) . '</td>';
-                            echo '<td>
-                                <a href="sub/delete_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '" class="button delete-button">Delete</a>
-                                <a href="sub/update_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '" class="button update-button">Update</a>
-                            </td>';
-                            echo '</tr>';
-                        }
-                    } else {
-                        echo '<tr><td colspan="6">No employees found</td></tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
 
-        <div class="pagination">
-            <a href="?page=1" class="button">First</a>
-            <a href="?page=<?php echo max(1, $page - 1); ?>" class="button">Prev</a>
-            <a href="?page=<?php echo min($totalPages, $page + 1); ?>" class="button">Next</a>
-            <a href="?page=<?php echo $totalPages; ?>" class="button">Last</a>
-        </div>
-    </header>
-</div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input 
+                    type="text" 
+                    id="address" 
+                    name="address" 
+                    value="<?php echo htmlspecialchars($employee['Address']); ?>" 
+                    required
+                    maxlength="255"
+                >
+            </div>
 
+            <div class="form-group">
+                <label for="date_of_birth">Date of Birth:</label>
+                <input 
+                    type="date" 
+                    id="date_of_birth" 
+                    name="date_of_birth" 
+                    value="<?php echo htmlspecialchars($employee['DateOfBirth']); ?>" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="pseudonym">Pseudonym:</label>
+                <input 
+                    type="text" 
+                    id="pseudonym" 
+                    name="pseudonym" 
+                    value="<?php echo htmlspecialchars($employee['Pseudonym']); ?>" 
+                    required
+                    maxlength="255"
+                >
+            </div>
+
+            <button type="submit">Update Employee</button>
+        </form>
+
+        <a href="../employee.php" class="btn">Back to Employees</a>
+    </div>
 </body>
 </html>

@@ -92,8 +92,8 @@ try {
                                 echo '<td>' . htmlspecialchars($row['DateOfBirth']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['Pseudonym']) . '</td>';
                                 echo '<td>
-                                    <a href="sub/delete_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '?>"class="button delete-button">Delete</a> 
-                                    <a href="sub/update_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '?>"class="button update-button">Update</a> 
+                                    <a href="sub/delete_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '"class="button delete-button">Delete</a> 
+                                    <a href="sub/update_employee.php?taxpayer_id=' . $row['TaxpayerID'] . '"class="button update-button">Update</a> 
                                 </td>';
                                 echo '</tr>';
                             }

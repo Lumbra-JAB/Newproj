@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         // Update customer details
         $stmt = $connection->prepare("UPDATE customer SET Name = ?, PhoneNumber = ?, Address = ?, DateOfBirth = ? WHERE CustomerID = ?");
-        $stmt->bind_param("sssss", $name, $phoneNumber, $address, $dateOfBirth, $customerID);
+        $stmt->bind_param("ssssi", $name, $phoneNumber, $address, $dateOfBirth, $customerID);
 
         if ($stmt->execute()) {
             $successMessage = "Customer updated successfully.";
@@ -67,23 +67,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="container">
-        <h2>Update Customer ID: <?php echo htmlspecialchars($customerID);
-        ?></h2>
+        <?php 
+            echo '<h2> Update Customer ID:'. ' ' . $customerID . ' </h2>';
+        ?>
         
         <?php 
-        // Display errors
-        if (!empty($errors)) {
-            echo '<div class="error-message">';
-            foreach ($errors as $error) {
-                echo '<p>' . htmlspecialchars($error) . '</p>';
+            // Display errors
+            if (!empty($errors)) {
+                echo '<div class="error-message">';
+                foreach ($errors as $error) {
+                    echo '<p>' . htmlspecialchars($error) . '</p>';
+                }
+                echo '</div>';
             }
-            echo '</div>';
-        }
 
-        // Display success message
-        if (isset($successMessage)) {
-            echo '<div class="success-message">' . htmlspecialchars($successMessage) . '</div>';
-        }
+            // Display success message
+            if (isset($successMessage)) {
+                echo '<div class="success-message">' . htmlspecialchars($successMessage) . '</div>';
+            }
         ?>
 
         <form method="POST" action="">
