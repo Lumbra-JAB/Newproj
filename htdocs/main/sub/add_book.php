@@ -2,18 +2,6 @@
 session_start();
 include '../database.php';
 
-// Generate ISBN-13 with a valid check digit
-function generateISBN() {
-    $isbnBase = str_pad(rand(0, 999999999999), 12, '0', STR_PAD_LEFT);
-    $sum = 0;
-    for ($i = 0; $i < 12; $i++) {
-        $digit = (int) $isbnBase[$i];
-        $sum += ($i % 2 === 0) ? $digit : $digit * 3;
-    }
-    $checkDigit = (10 - ($sum % 10)) % 10;
-    return $isbnBase . $checkDigit;
-}
-
 // Fetch employees for the dropdown
 function getEmployees($connection) {
     return $connection->query("SELECT TaxpayerID, Name FROM employee");
@@ -44,28 +32,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Handle image upload
     $imagePath = null;
     if (!empty($_FILES['image_path']['name']) && $_FILES['image_path']['error'] === UPLOAD_ERR_OK) {
-        $targetDir = "uploads/";
-        if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
-        $imagePath = $targetDir . uniqid() . '_' . basename($_FILES['image_path']['name']);
-        if (!move_uploaded_file($_FILES['image_path']['tmp_name'], $imagePath)) {
-            $feedback = "Error uploading the image.";
+        if ($_FILES['image_path']['size'] <= 1048576) { // 1 MB = 1,048,576 bytes
+            $targetDir = "uploads/";
+            if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
+            $imagePath = $targetDir . uniqid() . '_' . basename($_FILES['image_path']['name']);
+            if (!move_uploaded_file($_FILES['image_path']['tmp_name'], $imagePath)) {
+                $feedback = "Error uploading the image.";
+            }
+        } else {
+            $feedback = "Error: The image file size must not exceed 1 MB.";
         }
     }
 
     // Validate and insert book
-    if (strlen($isbn) === 13 && $publisher) {
+    if (strlen($isbn) === 13 && $publisher && empty($feedback)) {
         if (addBook($connection, $isbn, $title, $year, $publisher, $imagePath)) {
             $feedback = "New book added successfully.";
             $bookAdded = true;
         } else {
             $feedback = "Error adding book.";
         }
-    } else {
+    } else if (empty($feedback)) {
         $feedback = "Error: ISBN must be 13 digits and publisher must be valid.";
     }
 }
 
-$autoISBN = generateISBN();
 $employees = getEmployees($connection);
 ?>
 
@@ -90,8 +81,8 @@ $employees = getEmployees($connection);
     <?php endif; ?>
 
     <form method="POST" action="" enctype="multipart/form-data">
-        <label>ISBN (Auto-generated):</label><br>
-        <input type="text" name="isbn" value="<?php echo htmlspecialchars($autoISBN); ?>" readonly><br>
+        <label>ISBN:</label><br>
+        <input type="text" name="isbn" required><br>
         <label>Title:</label><br>
         <input type="text" name="title" required><br>
         <label>Year:</label><br>
@@ -104,7 +95,7 @@ $employees = getEmployees($connection);
                 </option>
             <?php endwhile; ?>
         </select><br>
-        <label>Image:</label><br>
+        <label>Image (Max: 1MB):</label><br>
         <input type="file" name="image_path" accept=".png, .jpg, .jpeg"><br>
         <input type="submit" value="Add Book">
     </form>

@@ -1,4 +1,4 @@
-/* General Reset */
+
 * {
     margin: 0;
     padding: 0;
@@ -51,7 +51,7 @@ nav .links a {
 }
 
 nav .links a:hover {
-    background-color: #575757;
+    background-color: #0066cc;
 }
 
 /* Header Styling */
@@ -231,16 +231,89 @@ button:hover {
 .hidden {
     display: none !important;
 }
-.buy-button {
-    display: inline-block;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 10px;
+/* Individual Book Styling */
+.book-item {
+    width: 250px; /* Fixed width for all book items */
+    height: 350px; /* Fixed height for the entire book box */
+    background-color: white;
+    border: 2px solid #ddd; /* Define a clear box boundary */
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* Ensures content is evenly spaced */
+    overflow: hidden; /* Prevents overflow from breaking alignment */
 }
 
-.buy-button:hover {
-    background-color: #45a049;
+/* Aligning image inside the box */
+.book-item img {
+    max-width: 100%;
+    height: 150px; /* Fixed height for all images */
+    object-fit: cover; /* Ensures images fill the space proportionally */
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Styling for the text box */
+.book-item .book-info {
+    width: 100%; /* Fill the width of the box */
+    height: 150px; /* Fixed height for text box */
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left; /* Align text for better readability */
+    overflow: hidden; /* Ensures long text doesn't break layout */
+}
+
+/* Text spacing and styling */
+.book-item .book-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden; /* Hides text overflow */
+    text-overflow: ellipsis; /* Adds "..." for overflow text */
+    white-space: nowrap; /* Prevents wrapping */
+}
+
+/* Styling for links */
+.book-item .book-info a {
+    display: inline-block;
+    margin: 5px 5px 0 0;
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.book-item .book-info a:hover {
+    color: #0056b3;
+}
+
+/* Hover effect for the entire box */
+.book-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Container for books */
+.books-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Consistent spacing between items */
+    margin-top: 20px;
+}
+nav .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+nav img {
+    width: 80px; /* Adjust the logo size */
+    height: auto;
+    border-radius: 5px; /* Optional: Add rounded corners */
 }

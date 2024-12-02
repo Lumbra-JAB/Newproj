@@ -10,7 +10,10 @@ include 'database.php';
 </head>
 <body>
 <nav>
-    <h1><div class="logo"><b>Local Bookstore</b></div></h1>
+    <div class="logo-container">
+    <img src="https://img.pikbest.com/png-images/book-logo-vector-graphic-element_2433299.png!sw800" alt="Logo">
+    <h1><b>Local Bookstore</b></h1>
+</div>
     <div class="links">
         <a href="home.php">Home</a>
         <a href="book.php">Books</a>
