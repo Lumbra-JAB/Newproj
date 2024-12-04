@@ -32,15 +32,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Handle image upload
     $imagePath = null;
     if (!empty($_FILES['image_path']['name']) && $_FILES['image_path']['error'] === UPLOAD_ERR_OK) {
-        if ($_FILES['image_path']['size'] <= 1048576) { // 1 MB = 1,048,576 bytes
+        $file = $_FILES['image_path'];
+        $fileName = basename($file['name']);
+        $fileSize = $file['size'];
+        $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+
+        // Define allowed file types and size limit (1 MB)
+        $allowedTypes = ['jpg', 'jpeg', 'png'];
+        $maxSize = 1 * 1024 * 1024; // 1 MB
+
+        if (in_array($fileExt, $allowedTypes) && $fileSize <= $maxSize) {
             $targetDir = "uploads/";
             if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
-            $imagePath = $targetDir . uniqid() . '_' . basename($_FILES['image_path']['name']);
-            if (!move_uploaded_file($_FILES['image_path']['tmp_name'], $imagePath)) {
+
+            // Create unique file name and upload file
+            $newFileName = uniqid() . '.' . $fileExt;
+            $imagePath = $targetDir . $newFileName;
+
+            if (!move_uploaded_file($file['tmp_name'], $imagePath)) {
                 $feedback = "Error uploading the image.";
             }
         } else {
-            $feedback = "Error: The image file size must not exceed 1 MB.";
+            $feedback = "Invalid file type or size exceeded. Allowed types: jpg, jpeg, png. Max size: 1 MB.";
         }
     }
 
