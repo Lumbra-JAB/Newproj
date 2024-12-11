@@ -3,21 +3,20 @@ session_start();
 include '../database.php';
 
 // Load employees and customers for the form
-$employee = $connection->query("SELECT * FROM employee");
+
 $customer = $connection->query("SELECT * FROM customer");
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $customerID = $_POST['customerID'];
-    $taxpayerID = $_POST['employeeID']; // Corrected to match the form's name attribute
     $date = $_POST['date'];
     $time = $_POST['time'];
     $quantity = $_POST['quantity'];
 
     // Prepare and execute the insert query
-    $stmt = $connection->prepare("INSERT INTO salestransaction (CustomerID, TaxpayerID, Date, Time, Quantity) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssi", $customerID, $taxpayerID, $date, $time, $quantity);
+    $stmt = $connection->prepare("INSERT INTO salestransaction (CustomerID, Date, Time, Quantity) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sssi", $customerID,  $date, $time, $quantity);
 
     if ($stmt->execute()) {
         $feedback = "Sales transaction added successfully.";
@@ -55,14 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="">Select a customer</option>
             <?php while($row = $customer->fetch_assoc()) { ?>
                 <option value="<?php echo $row['CustomerID']; ?>"><?php echo $row['Name']; ?></option>
-            <?php } ?>
-        </select><br>
-
-        <label>Employee:</label><br>
-        <select name="employeeID" required>
-            <option value="">Select an employee</option>
-            <?php while($row = $employee->fetch_assoc()) { ?>
-                <option value="<?php echo $row['TaxpayerID']; ?>"><?php echo $row['Name']; ?></option>
             <?php } ?>
         </select><br>
 

@@ -36,7 +36,6 @@ include 'database.php';
                     <tr>
                         <th>TransactionID</th>
                         <th>CustomerID</th>
-                        <th>TaxpayerID</th>
                         <th>Date</th>
                         <th>Time</th>
                         <th>Quantity</th>
@@ -53,13 +52,13 @@ if ($result->num_rows > 0) {
         echo "<tr>
             <td>{$row['TransactionID']}</td>
             <td>{$row['CustomerID']}</td>
-            <td>{$row['TaxpayerID']}</td>
             <td>{$row['Date']}</td>
             <td>{$row['Time']}</td>
             <td>{$row['Quantity']}</td>
             <td>
-                <a href='sub/update_transaction.php?transactionID={$row['TransactionID']}' class='button update-button'>Update</a>
                 <a href='sub/delete_transaction.php?transactionID={$row['TransactionID']}' class='button delete-button'>Delete</a>
+                <a href='sub/update_transaction.php?transactionID={$row['TransactionID']}' class='button update-button'>Update</a>
+                
             </td>
         </tr>";
     }

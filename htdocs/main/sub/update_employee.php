@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         // Update employee details
         $stmt = $connection->prepare("UPDATE employee SET Name = ?, Address = ?, DateOfBirth = ?, Pseudonym = ? WHERE TaxpayerID = ?");
-        $stmt->bind_param("sssii", $name, $address, $dateOfBirth, $pseudonym, $taxpayerID);
+        $stmt->bind_param("ssssi", $name, $address, $dateOfBirth, $pseudonym, $taxpayerID);
 
         if ($stmt->execute()) {
             $successMessage = "Employee updated successfully.";
